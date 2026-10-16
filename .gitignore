@@ -54,3 +54,5 @@ uploads/
 **/.env
 **/.env.*
 !**/.env.example
+
+DESKTOP_APP_CONTEXT.md
