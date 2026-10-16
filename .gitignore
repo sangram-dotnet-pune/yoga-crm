@@ -13,6 +13,8 @@ dist/
 build/
 coverage/
 
+#fixed
+
 # Environment variables and secrets
 .env
 .env.*
