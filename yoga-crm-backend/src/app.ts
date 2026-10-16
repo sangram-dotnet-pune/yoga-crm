@@ -11,6 +11,7 @@ import { healthRouter } from './routes/health.routes';
 import { patientRouter } from './routes/patient.routes';
 import { paymentRouter } from './routes/payment.routes';
 import { visitRouter } from './routes/visit.routes';
+import { xrayRouter } from './routes/xray.routes';
 
 export function createApp() {
   const app = express();
@@ -47,6 +48,7 @@ export function createApp() {
   app.use('/api', visitRouter);
   app.use('/api', exerciseRouter);
   app.use('/api', paymentRouter);
+  app.use('/api', xrayRouter);
   app.use(notFoundHandler);
   app.use(errorHandler);
 

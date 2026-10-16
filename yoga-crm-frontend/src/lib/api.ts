@@ -82,7 +82,7 @@ function buildHeaders(init?: RequestInit): Record<string, string> {
   const headers: Record<string, string> = {
     ...((init?.headers as Record<string, string> | undefined) ?? {}),
   };
-  if (init?.body && !headers["Content-Type"]) {
+  if (init?.body && !headers["Content-Type"] && !(init.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
   if (accessToken) {

@@ -72,6 +72,38 @@ export type PlanLog = {
   months: number;
 };
 
+export type XrayKind = "Before" | "After" | "Record";
+export const XRAY_KINDS: XrayKind[] = ["Before", "After", "Record"];
+
+export type Xray = {
+  id: string;
+  patientId: string;
+  kind: XrayKind;
+  date: string;
+  bodyArea: string | null;
+  title: string | null;
+  notes: string | null;
+  mimeType: string;
+  sizeBytes: number;
+  url: string;
+  createdAt: string;
+};
+
+export type XrayInput = {
+  date: string;
+  kind: XrayKind;
+  bodyArea?: string;
+  title?: string;
+  notes?: string;
+};
+
+export type XrayMetadataInput = {
+  date?: string;
+  bodyArea?: string | null;
+  title?: string | null;
+  notes?: string | null;
+};
+
 export type PatientDetail = Patient & {
   visits: Visit[];
   payments: Payment[];

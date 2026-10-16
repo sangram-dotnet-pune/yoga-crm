@@ -71,6 +71,20 @@ export type PlanLogDTO = {
   months: number;
 };
 
+export type XrayDTO = {
+  id: string;
+  patientId: string;
+  kind: string;
+  date: string;
+  bodyArea: string | null;
+  title: string | null;
+  notes: string | null;
+  mimeType: string;
+  sizeBytes: number;
+  url: string;
+  createdAt: string;
+};
+
 export function serializePatient(patient: Patient): PatientDTO {
   const fee = toAmount(patient.fee);
   const paid = toAmount(patient.paid);

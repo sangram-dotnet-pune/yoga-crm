@@ -3,6 +3,7 @@ import type {
   ExpenseCategory,
   PatientStatus,
   PayMethod,
+  XrayKind,
 } from '@prisma/client';
 
 export const PATIENT_STATUSES = ['Active', 'Completed', 'Follow-up'] as const;
@@ -139,5 +140,29 @@ export function apptStatusToApi(value: ApptStatus): ApptStatusLabel {
       return 'No Show';
     default:
       return 'Scheduled';
+  }
+}
+
+export const XRAY_KINDS = ['Before', 'After', 'Record'] as const;
+export type XrayKindLabel = (typeof XRAY_KINDS)[number];
+
+const XRAY_KIND_TO_DB: Record<XrayKindLabel, XrayKind> = {
+  Before: 'LEGACY_BEFORE',
+  After: 'LEGACY_AFTER',
+  Record: 'RECORD',
+};
+
+export function xrayKindToDb(label: XrayKindLabel): XrayKind {
+  return XRAY_KIND_TO_DB[label];
+}
+
+export function xrayKindToApi(value: XrayKind): XrayKindLabel {
+  switch (value) {
+    case 'LEGACY_BEFORE':
+      return 'Before';
+    case 'LEGACY_AFTER':
+      return 'After';
+    default:
+      return 'Record';
   }
 }

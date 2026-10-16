@@ -12,12 +12,14 @@ import {
   getPatient,
   reconcilePayments,
 } from "@/lib/patients";
+import { listXrays } from "@/lib/xrays";
 import { displayValue, formatCurrency, formatDate } from "@/lib/format";
-import type { PatientDetail, Payment, Visit } from "@/lib/types";
+import type { PatientDetail, Payment, Visit, Xray } from "@/lib/types";
 import { PatientForm } from "@/components/patients/PatientForm";
 import { VisitForm } from "@/components/patients/VisitForm";
 import { PaymentForm } from "@/components/patients/PaymentForm";
 import { ExerciseEditor } from "@/components/patients/ExerciseEditor";
+import { XraysTab } from "@/components/patients/XraysTab";
 import {
   Button,
   Card,
@@ -29,12 +31,13 @@ import {
   StatusBadge,
 } from "@/components/ui";
 
-type Tab = "overview" | "visits" | "exercises" | "payments";
+type Tab = "overview" | "visits" | "exercises" | "xrays" | "payments";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "visits", label: "Visits" },
   { id: "exercises", label: "Exercise plan" },
+  { id: "xrays", label: "X-rays" },
   { id: "payments", label: "Payments" },
 ];
 
@@ -54,6 +57,7 @@ export default function PatientDetailPage() {
   const patientId = Array.isArray(rawId) ? rawId[0] : rawId;
 
   const [detail, setDetail] = useState<PatientDetail | null>(null);
+  const [xrays, setXrays] = useState<Xray[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -94,9 +98,23 @@ export default function PatientDetailPage() {
       .finally(() => {
         if (active) setLoading(false);
       });
+    listXrays(patientId)
+      .then((rows) => {
+        if (active) setXrays(rows);
+      })
+      .catch(() => {
+        if (active) setXrays([]);
+      });
     return () => {
       active = false;
     };
+  }, [patientId]);
+
+  const refreshXrays = useCallback(() => {
+    if (!patientId) return;
+    listXrays(patientId)
+      .then(setXrays)
+      .catch(() => setXrays([]));
   }, [patientId]);
 
   async function runAction(action: () => Promise<unknown>) {
@@ -218,6 +236,10 @@ export default function PatientDetailPage() {
           exercises={detail.exercises}
           onSaved={() => void load()}
         />
+      ) : null}
+
+      {tab === "xrays" ? (
+        <XraysTab patientId={detail.id} xrays={xrays} onChanged={refreshXrays} />
       ) : null}
 
       {tab === "payments" ? (

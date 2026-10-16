@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
+import { MulterError } from 'multer';
 import { ZodError } from 'zod';
 import { env } from '../config/env';
 
@@ -27,6 +28,12 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
         details: err.flatten().fieldErrors,
       },
     });
+    return;
+  }
+
+  if (err instanceof MulterError) {
+    const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+    res.status(status).json({ error: { code: err.code, message: err.message } });
     return;
   }
 
