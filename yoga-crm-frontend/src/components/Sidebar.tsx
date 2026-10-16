@@ -48,7 +48,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
-          const active = pathname === item.href;
+          const active =
+            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           const Icon = item.icon;
           return (
             <Link

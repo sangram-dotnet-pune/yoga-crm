@@ -6,7 +6,11 @@ import helmet from 'helmet';
 import { env } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import { authRouter } from './routes/auth.routes';
+import { exerciseRouter } from './routes/exercise.routes';
 import { healthRouter } from './routes/health.routes';
+import { patientRouter } from './routes/patient.routes';
+import { paymentRouter } from './routes/payment.routes';
+import { visitRouter } from './routes/visit.routes';
 
 export function createApp() {
   const app = express();
@@ -39,7 +43,10 @@ export function createApp() {
 
   app.use('/api/health', healthRouter);
   app.use('/api/auth', authRouter);
-
+  app.use('/api/patients', patientRouter);
+  app.use('/api', visitRouter);
+  app.use('/api', exerciseRouter);
+  app.use('/api', paymentRouter);
   app.use(notFoundHandler);
   app.use(errorHandler);
 
