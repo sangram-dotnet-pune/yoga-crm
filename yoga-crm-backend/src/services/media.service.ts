@@ -81,8 +81,14 @@ export async function uploadPatientImage(
   }
 }
 
-export async function signStorageKey(storageKey: string): Promise<string> {
+export async function downloadStorageObject(storageKey: string): Promise<Buffer | null> {
   const supabase = getStorageClient();
+  const { data, error } = await supabase.storage.from(storageBucket).download(storageKey);
+  if (error || !data) return null;
+  return Buffer.from(await data.arrayBuffer());
+}
+
+export async function signStorageKey(storageKey: string): Promise<string> {  const supabase = getStorageClient();
   const { data, error } = await supabase.storage
     .from(storageBucket)
     .createSignedUrl(storageKey, SIGNED_URL_TTL_SECONDS);

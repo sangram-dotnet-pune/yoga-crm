@@ -3,23 +3,25 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { ArrowLeft, FileText, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { ApiError } from "@/lib/api";
 import {
   deletePatient,
   deletePayment,
   deleteVisit,
   getPatient,
+  getPatientReport,
   reconcilePayments,
 } from "@/lib/patients";
 import { listXrays } from "@/lib/xrays";
-import { displayValue, formatCurrency, formatDate } from "@/lib/format";
+import { displayValue, downloadBlob, formatCurrency, formatDate } from "@/lib/format";
 import type { PatientDetail, Payment, Visit, Xray } from "@/lib/types";
 import { PatientForm } from "@/components/patients/PatientForm";
 import { VisitForm } from "@/components/patients/VisitForm";
 import { PaymentForm } from "@/components/patients/PaymentForm";
 import { ExerciseEditor } from "@/components/patients/ExerciseEditor";
 import { XraysTab } from "@/components/patients/XraysTab";
+import { ReportTab } from "@/components/patients/ReportTab";
 import {
   Button,
   Card,
@@ -31,7 +33,7 @@ import {
   StatusBadge,
 } from "@/components/ui";
 
-type Tab = "overview" | "visits" | "exercises" | "xrays" | "payments";
+type Tab = "overview" | "visits" | "exercises" | "xrays" | "payments" | "report";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -39,6 +41,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "exercises", label: "Exercise plan" },
   { id: "xrays", label: "X-rays" },
   { id: "payments", label: "Payments" },
+  { id: "report", label: "Outcome report" },
 ];
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -62,6 +65,7 @@ export default function PatientDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [tab, setTab] = useState<Tab>("overview");
 
   const [editOpen, setEditOpen] = useState(false);
@@ -144,6 +148,20 @@ export default function PatientDetailPage() {
     }
   }
 
+  async function exportReport() {
+    if (!patientId) return;
+    setExporting(true);
+    setActionError(null);
+    try {
+      const { blob, filename } = await getPatientReport(patientId);
+      downloadBlob(blob, filename ?? `${detail?.patientCode ?? "patient"}-report.pdf`);
+    } catch (err) {
+      setActionError(err instanceof ApiError ? err.message : "Unable to generate the report.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   if (loading && !detail) return <LoadingState label="Loading patient…" />;
   if (error) return <ErrorState message={error} />;
   if (!detail) return null;
@@ -163,6 +181,10 @@ export default function PatientDetailPage() {
         description={`${detail.patientCode} · ${detail.condition}`}
         actions={
           <>
+            <Button variant="secondary" onClick={() => void exportReport()} disabled={exporting}>
+              <FileText size={16} aria-hidden />
+              Export PDF
+            </Button>
             <Button variant="secondary" onClick={() => setEditOpen(true)}>
               <Pencil size={16} aria-hidden />
               Edit
@@ -253,6 +275,15 @@ export default function PatientDetailPage() {
               void runAction(() => deletePayment(payment.id));
             }
           }}
+        />
+      ) : null}
+
+      {tab === "report" ? (
+        <ReportTab
+          detail={detail}
+          xrays={xrays}
+          exporting={exporting}
+          onExport={() => void exportReport()}
         />
       ) : null}
 

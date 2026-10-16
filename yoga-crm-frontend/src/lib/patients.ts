@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch, apiFetchBlob, type DownloadedFile } from "./api";
 import type {
   Exercise,
   ExerciseInput,
@@ -102,4 +102,8 @@ export function deletePayment(id: string): Promise<{ patient: Patient }> {
 
 export function reconcilePayments(patientId: string): Promise<Patient> {
   return apiFetch<Patient>(`/patients/${patientId}/payments/reconcile`, { method: "POST" });
+}
+
+export function getPatientReport(id: string): Promise<DownloadedFile> {
+  return apiFetchBlob(`/patients/${id}/report`);
 }

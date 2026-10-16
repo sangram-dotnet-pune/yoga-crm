@@ -154,3 +154,43 @@ export async function logoutRequest(): Promise<void> {
 export function getHealth(): Promise<Health> {
   return apiFetch<Health>("/health", undefined, { retryOnUnauthorized: false });
 }
+
+export type DownloadedFile = { blob: Blob; filename: string | null };
+
+export async function apiFetchBlob(path: string): Promise<DownloadedFile> {
+  let response = await fetch(`${API_BASE}${path}`, {
+    headers: buildHeaders(),
+    credentials: "include",
+  });
+
+  if (response.status === 401 && !path.startsWith("/auth/")) {
+    const user = await refreshSession();
+    if (user) {
+      response = await fetch(`${API_BASE}${path}`, {
+        headers: buildHeaders(),
+        credentials: "include",
+      });
+    }
+  }
+
+  if (!response.ok) {
+    let errorBody: ApiErrorBody | null = null;
+    try {
+      const json = (await response.json()) as { error?: ApiErrorBody };
+      errorBody = json.error ?? null;
+    } catch {
+      errorBody = null;
+    }
+    throw new ApiError(
+      response.status,
+      errorBody ?? {
+        code: "REQUEST_FAILED",
+        message: response.statusText || "Request failed",
+      },
+    );
+  }
+
+  const disposition = response.headers.get("content-disposition");
+  const filename = disposition ? /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? null : null;
+  return { blob: await response.blob(), filename };
+}
