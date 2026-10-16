@@ -44,7 +44,16 @@ npm run lint
 ```
 src/
   app/            App Router routes (layout, pages)
-  lib/api.ts      Typed fetch client + backend health check
+  lib/api.ts      Typed fetch client, session refresh, backend health check
+  lib/auth.tsx    Auth context (in-memory access token + user)
+  lib/theme.tsx   Light/dark theme store (persisted as `yogacare-theme`)
+  components/     Sidebar, Topbar, ThemeToggle, UI primitives
 ```
 
-The home page performs a live backend health check to verify connectivity.
+## Authentication
+
+The access token is held in memory only (never `localStorage`); the refresh token is an
+httpOnly cookie managed by the backend. On load the app calls `/api/auth/refresh` to restore
+a session. Unauthenticated users are redirected to `/login`. `/api/*` is proxied to the
+backend, so cookies work same-origin in development.
+

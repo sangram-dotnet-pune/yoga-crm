@@ -42,6 +42,30 @@ npm run migrate:deploy    # apply migrations in production
 npm run prisma:studio     # browse data
 ```
 
+## First-run account
+
+Create the clinic and its clinician using the seed script. Set `SEED_EMAIL`,
+`SEED_PASSWORD`, `SEED_CLINIC_NAME`, and `SEED_DOCTOR_NAME` in `.env`, then:
+
+```sh
+npm run seed
+```
+
+The seed is a no-op if a user already exists.
+
+## Authentication
+
+Stateless JWT access tokens (memory on the client) + DB-persisted, rotating refresh
+tokens delivered in an httpOnly cookie.
+
+- `POST /api/auth/login` — `{ email, password }` → `{ user, accessToken }` + refresh cookie
+- `POST /api/auth/refresh` — rotates the refresh cookie → `{ user, accessToken }`
+- `POST /api/auth/logout` — revokes the refresh token and clears the cookie
+- `GET /api/auth/me` — requires `Authorization: Bearer <accessToken>`
+
+Refresh-token reuse is detected and revokes all of that user's active tokens.
+
+
 ## Commands
 
 ```sh
