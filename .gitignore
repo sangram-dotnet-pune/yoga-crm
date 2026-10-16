@@ -45,3 +45,12 @@ uploads/
 
 # Test output
 .nyc_output/
+
+
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/.env
+**/.env.*
+!**/.env.example
