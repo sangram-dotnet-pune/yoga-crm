@@ -6,8 +6,11 @@ import helmet from 'helmet';
 import { env } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import { authRouter } from './routes/auth.routes';
+import { appointmentRouter } from './routes/appointment.routes';
 import { exerciseRouter } from './routes/exercise.routes';
+import { expenseRouter } from './routes/expense.routes';
 import { healthRouter } from './routes/health.routes';
+import { outcomesRouter } from './routes/outcomes.routes';
 import { patientRouter } from './routes/patient.routes';
 import { paymentRouter } from './routes/payment.routes';
 import { visitRouter } from './routes/visit.routes';
@@ -49,6 +52,9 @@ export function createApp() {
   app.use('/api', exerciseRouter);
   app.use('/api', paymentRouter);
   app.use('/api', xrayRouter);
+  app.use('/api', appointmentRouter);
+  app.use('/api', expenseRouter);
+  app.use('/api', outcomesRouter);
   app.use(notFoundHandler);
   app.use(errorHandler);
 

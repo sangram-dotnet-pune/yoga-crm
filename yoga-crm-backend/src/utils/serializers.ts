@@ -1,6 +1,6 @@
-import type { Exercise, Patient, Payment, PlanLog, Visit } from '@prisma/client';
+import type { Appointment, Exercise, Expense, Patient, Payment, PlanLog, Visit } from '@prisma/client';
 import { formatDate } from './dates';
-import { payMethodToApi, patientStatusToApi } from './enums';
+import { apptStatusToApi, expenseCategoryToApi, payMethodToApi, patientStatusToApi } from './enums';
 import { toAmount } from './money';
 import { balanceOf, creditOf, derivePaymentStatus, type PaymentStatus } from './payment';
 
@@ -85,6 +85,34 @@ export type XrayDTO = {
   createdAt: string;
 };
 
+export type AppointmentDTO = {
+  id: string;
+  patientId: string;
+  patientName: string;
+  patientCode: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  type: string;
+  status: string;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ExpenseDTO = {
+  id: string;
+  date: string;
+  category: string;
+  description: string;
+  amount: number;
+  paymentMethod: string;
+  patientId: string | null;
+  patientName: string | null;
+  notes: string | null;
+  createdAt: string;
+};
+
 export function serializePatient(patient: Patient): PatientDTO {
   const fee = toAmount(patient.fee);
   const paid = toAmount(patient.paid);
@@ -162,5 +190,41 @@ export function serializePlanLog(planLog: PlanLog): PlanLogDTO {
     id: planLog.id,
     date: formatDate(planLog.date),
     months: planLog.months,
+  };
+}
+
+export function serializeAppointment(
+  appointment: Appointment & { patient: { name: string; patientCode: string } },
+): AppointmentDTO {
+  return {
+    id: appointment.id,
+    patientId: appointment.patientId,
+    patientName: appointment.patient.name,
+    patientCode: appointment.patient.patientCode,
+    date: formatDate(appointment.date),
+    startTime: appointment.startTime,
+    endTime: appointment.endTime,
+    type: appointment.type,
+    status: apptStatusToApi(appointment.status),
+    notes: appointment.notes,
+    createdAt: appointment.createdAt.toISOString(),
+    updatedAt: appointment.updatedAt.toISOString(),
+  };
+}
+
+export function serializeExpense(
+  expense: Expense & { patient: { name: string } | null },
+): ExpenseDTO {
+  return {
+    id: expense.id,
+    date: formatDate(expense.date),
+    category: expenseCategoryToApi(expense.category),
+    description: expense.description,
+    amount: toAmount(expense.amount),
+    paymentMethod: payMethodToApi(expense.paymentMethod),
+    patientId: expense.patientId,
+    patientName: expense.patient?.name ?? null,
+    notes: expense.notes,
+    createdAt: expense.createdAt.toISOString(),
   };
 }

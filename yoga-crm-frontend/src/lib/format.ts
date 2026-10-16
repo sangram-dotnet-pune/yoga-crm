@@ -18,6 +18,19 @@ export function formatDate(iso: string | null | undefined): string {
   }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
+export function formatTime(value: string | null | undefined): string {
+  if (!value) return "—";
+  const [hour, minute] = value.split(":").map(Number);
+  if (hour === undefined || minute === undefined || Number.isNaN(hour) || Number.isNaN(minute)) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(2000, 0, 1, hour, minute)));
+}
+
 export function todayISO(): string {
   const now = new Date();
   const year = now.getFullYear();

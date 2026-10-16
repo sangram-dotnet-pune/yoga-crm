@@ -163,3 +163,112 @@ export type ExerciseInput = {
   duration?: string;
   notes?: string;
 };
+
+export type AppointmentStatus = "Scheduled" | "Completed" | "Cancelled" | "No Show";
+export const APPOINTMENT_STATUSES: AppointmentStatus[] = [
+  "Scheduled",
+  "Completed",
+  "Cancelled",
+  "No Show",
+];
+
+export const APPOINTMENT_TYPES: string[] = [
+  "Initial assessment",
+  "Follow-up",
+  "Rehabilitation",
+  "Therapy session",
+  "Consultation",
+];
+
+export type Appointment = {
+  id: string;
+  patientId: string;
+  patientName: string;
+  patientCode: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  type: string;
+  status: AppointmentStatus;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AppointmentInput = {
+  patientId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  type: string;
+  status?: AppointmentStatus;
+  notes?: string | null;
+};
+
+export type ExpenseCategory =
+  | "Equipment"
+  | "Supplies"
+  | "Rent"
+  | "Utilities"
+  | "Marketing"
+  | "Staff"
+  | "Maintenance"
+  | "Other";
+
+export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
+  "Equipment",
+  "Supplies",
+  "Rent",
+  "Utilities",
+  "Marketing",
+  "Staff",
+  "Maintenance",
+  "Other",
+];
+
+export type Expense = {
+  id: string;
+  date: string;
+  category: ExpenseCategory;
+  description: string;
+  amount: number;
+  paymentMethod: PayMethod;
+  patientId: string | null;
+  patientName: string | null;
+  notes: string | null;
+  createdAt: string;
+};
+
+export type ExpenseInput = {
+  date: string;
+  category: ExpenseCategory;
+  description: string;
+  amount: number;
+  paymentMethod: PayMethod;
+  patientId?: string | null;
+  notes?: string | null;
+};
+
+export type OutcomeRange = "day" | "week" | "month" | "quarter" | "year";
+
+export const OUTCOME_RANGES: OutcomeRange[] = ["day", "week", "month", "quarter", "year"];
+
+export type Outcomes = {
+  range: OutcomeRange;
+  from: string;
+  to: string;
+  kpis: {
+    collected: number;
+    newPatients: number;
+    followUps: number;
+    avgPainReduction: number;
+  };
+  revenue: { label: string; value: number }[];
+  demand: { label: string; newPatients: number; followUps: number }[];
+  progress: {
+    painImproved: number;
+    mobilityImproved: number;
+    activePlans: number;
+    totalPatients: number;
+  };
+};
